@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Заголовок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        Аналитика по студентам
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">Возраст, пол, баллы ЕГЭ и выбор специальностей</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Фильтры графика по специальностям -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        Фильтры графика по специальностям
+                    </h5>
+                    <form method="GET" action="/dataapp/analytics/students/" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" for="chart_type">Тип графика:</label>
+                            <select class="form-select" name="chart_type" id="chart_type">
+                                <option value="bar" {% if chart_type == 'bar' %}selected{% endif %}>Столбчатая диаграмма</option>
+                                <option value="line" {% if chart_type == 'line' %}selected{% endif %}>Линейная диаграмма</option>
+                                <option value="scatter" {% if chart_type == 'scatter' %}selected{% endif %}>Диаграмма рассеяния</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" for="specialty_type">Специальность:</label>
+                            <select class="form-select" name="specialty_type" id="specialty_type">
+                                <option value="">Все специальности</option>
+                                {% for specialty in chart_specialties %}
+                                    <option value="{{ specialty }}" {% if specialty == specialty_type %}selected{% endif %}>{{ specialty }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" type="submit">
+                                <i class="bi bi-check-circle me-2"></i>Применить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if graph_html %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="card-title mb-0">График по специальностям</h5>
+                        <span class="text-muted small">
+                            <i class="bi bi-info-circle me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Бюджетные места — финансирование РФ, платные места — контрактная основа."></i>
+                            Бюджетные и платные места
+                        </span>
+                    </div>
+                    {{ graph_html | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Фильтры студентов -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-funnel me-2"></i>
+                        Фильтры студентов
+                    </h5>
+                    <form method="GET" action="/dataapp/analytics/students/" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" for="specialty">Специальность:</label>
+                            <select class="form-select" name="specialty" id="specialty">
+                                <option value="">Все специальности</option>
+                                {% for specialty in specialties %}
+                                    <option value="{{ specialty }}" {% if specialty == specialty_filter %}selected{% endif %}>{{ specialty }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" for="gender">Пол:</label>
+                            <select class="form-select" name="gender" id="gender">
+                                <option value="">Все</option>
+                                <option value="М" {% if gender_filter == 'М' %}selected{% endif %}>Мужчины</option>
+                                <option value="Ж" {% if gender_filter == 'Ж' %}selected{% endif %}>Женщины</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" type="submit">
+                                <i class="bi bi-check-circle me-2"></i>Применить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not student_charts %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2 fs-4"></i>
+                    <div>
+                        <strong>Нет данных по студентам.</strong>
+                        <p class="mb-0">Загрузите файл на странице графиков.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if student_charts.age_distribution %}
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.age_distribution | safe }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.gender_pyramid | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if student_charts.city_region_pie %}
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.city_region_pie | safe }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.geo_heatmap | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if student_charts.subject_histogram %}
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.subject_histogram | safe }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.subject_boxplot | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if student_charts.top_passing %}
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.top_passing | safe }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.score_scatter | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if student_charts.form_heatmap %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ student_charts.form_heatmap | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.form-select, .form-control {
+    border-radius: 8px;
+}
+.btn {
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

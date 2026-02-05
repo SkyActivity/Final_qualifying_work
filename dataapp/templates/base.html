@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Visualization#DATA{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/select2.min.css' %}"/>
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap-icons/bootstrap-icons.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+</head>
+<body>
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
+          <a href="/" class="logo d-flex align-items-center">
+            <span class="d-none d-lg-block">Visualization#DATA</span>
+          </a>
+          <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div>
+
+        {% if user.is_authenticated %}
+        <nav class="header-nav ms-auto">
+          <ul class="d-flex align-items-center">
+            <li class="nav-item dropdown pe-3">
+              <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                <img src="https://ds32-lipeck-r42.gosweb.gosuslugi.ru/netcat_files/21/10/kj8DXcMNKxKdXLWAA8ZX5gRzo953pjvh_49.jpg" alt="Profile" class="rounded-circle">
+                <span class="d-none d-md-block dropdown-toggle ps-2">{{ user.get_full_name|default:user.get_username }}</span>
+              </a><!-- End Profile Iamge Icon -->
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                <li class="dropdown-header">
+                    <h6>{{ user.get_full_name|default:user.get_username }}</h6>
+                    <span>{{ user.groups.all.0 }}</span>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                  {% if user.is_staff %}
+                <li>
+                  <a class="dropdown-item d-flex align-items-center" href="/admin">
+                    <i class="bi bi-person"></i>
+                    <span>Админ панель</span>
+                  </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                  {% endif %}
+                <li>
+                    <form class="dropdown-item d-flex align-items-center" action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link collapsed">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Выйти</span>
+                        </button>
+                    </form>
+                </li>
+
+              </ul><!-- End Profile Dropdown Items -->
+            </li><!-- End Profile Nav -->
+          </ul>
+        </nav>
+        {% endif %}
+    </header>
+    <aside id="sidebar" class="sidebar">
+        {% include 'navbar.html' %}
+    </aside>
+    <main id="main" class="main">
+    <div class="ml-4 mt-4">
+            {% block content %}
+            {% endblock %}
+    </div>
+    </main>
+    <footer id="footer" class="footer">
+        <div class="copyright">
+          &copy; Copyright <strong><span>Диплом</span></strong>. Все права защищенны
+        </div>
+        <div class="credits">
+          Диплом 2024
+        </div>
+    </footer>
+</body>
+    {% block scripts %}
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="{% static 'js/upload.js' %}"></script>
+    <script>
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            new bootstrap.Tooltip(el);
+        });
+    </script>
+    {% endblock %}
+</html>

@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Заголовок -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title mb-0">
+            <i class="bi bi-map me-2"></i>
+            Визуализация данных по регионам на карте
+          </h2>
+          <p class="text-muted mb-0 mt-2">Интерактивная карта с данными по городам и регионам</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Информация -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            Данные карты
+          </h5>
+          <p class="text-muted mb-0">
+            Точки берутся из сохраненных координат, а значения рассчитываются по данным из <code>Data.xlsx</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+    {% if result %}
+        <!-- Таблица данных -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="card-title mb-0">
+                    <i class="bi bi-table me-2"></i>
+                    Текущие данные
+                  </h5>
+                  <button id="downloadCsv" class="btn btn-primary" role="button">
+                    <i class="bi bi-download me-2"></i>Сохранить в CSV
+                  </button>
+                </div>
+                <div class="table-responsive">
+                <div id="messageDownload"></div>
+                <table class="table table-striped table-hover" id="dataTable">
+                <thead>
+                <tr>
+                    <th>Город</th>
+                    <th>Регион</th>
+                    <th>Средний балл</th>
+                    <th>Количество поступивших</th>
+                    <th>Количество абитуриентов</th>
+                </tr>
+                </thead>
+                  <tbody>
+                    {% if result %}
+                        {% for data in result %}
+                            <tr>
+                                <td>{{ data.city }}</td>
+                                <td>{{ data.region }}</td>
+                                <td>{{ data.averageScore }}</td>
+                                <td>{{ data.totalAccepted }}</td>
+                                <td>{{ data.totalApplicants }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Нет данных для отображения.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Фильтры и карта -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-4">
+                  <i class="bi bi-funnel me-2"></i>
+                  Фильтры
+                </h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="regionFilter" class="form-label fw-bold">Фильтр по региону:</label>
+                    <select id="regionFilter" name="regionFilter" class="form-select">
+                      <option value="">Все регионы</option>
+                      {% for data in result %}
+                        <option value="{{ data.region }}">{{ data.region }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="cityFilter" class="form-label fw-bold">Фильтр по городу:</label>
+                    <select id="cityFilter" name="cityFilter" class="form-select">
+                      <option value="">Все города</option>
+                      {% for data in result %}
+                        <option value="{{ data.city }}">{{ data.city }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карта -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-4">
+                  <i class="bi bi-map me-2"></i>
+                  Интерактивная карта
+                </h5>
+                <div id="map" style="height: 600px; border-radius: 8px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+    {% else %}
+      <div class="row">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+              <i class="bi bi-map fs-1 text-muted mb-3 d-block"></i>
+              <h4 class="mb-3">Нет данных для отображения на карте</h4>
+              <p class="text-muted">Загрузите данные через форму выше</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+</div>
+
+<style>
+.card {
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-2px);
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.075);
+}
+.form-select {
+  border-radius: 8px;
+}
+#map {
+  z-index: 1;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% if result %}
+        {% load static %}
+
+        <div id="applicant-data">{{ result|json_script:"applicant-data" }}</div>
+        <script>
+            var map = L.map('map').setView([55.75, 37.61], 6); // Начинаем с Москвы
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+
+            var applicantData = JSON.parse(document.getElementById('applicant-data').textContent);
+            var markers = [];
+
+            var customIcon = L.icon({
+                iconUrl: '{% static "images/marker-icon.png" %}',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            function addMarkers(data) {
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+
+                // Фильтруем данные с валидными координатами
+                    var validData = data.filter(function(d) {
+                    return d.lat && d.lon && d.lat != 0 && d.lon != 0 && d.totalApplicants > 0;
+                });
+
+                if (validData.length === 0) {
+                    return;
+                }
+
+                var bounds = [];
+
+                validData.forEach(function(data) {
+                    var popupText = `<b>${data.city}, ${data.region}</b><br>
+                                     Средний балл: ${data.averageScore}<br>
+                                     Количество поступивших: ${data.totalAccepted}<br>
+                                     Количество абитуриентов: ${data.totalApplicants}`;
+                    var marker = L.marker([data.lat, data.lon], { icon: customIcon })
+                        .addTo(map)
+                        .bindPopup(popupText);
+                    markers.push(marker);
+                    bounds.push([data.lat, data.lon]);
+                });
+
+                // Автоматически подстраиваем границы карты под маркеры
+                if (bounds.length > 0) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+            }
+
+            addMarkers(applicantData);
+
+            function filterData() {
+                var selectedRegion = $('#regionFilter').val();
+                var selectedCity = $('#cityFilter').val();
+
+                var filteredData = applicantData.filter(data => {
+                    // Точное сравнение: если выбран регион/город, должны совпадать
+                    var regionMatch = selectedRegion.length === 0 || data.region === selectedRegion;
+                    var cityMatch = selectedCity.length === 0 || data.city === selectedCity;
+                    return regionMatch && cityMatch;
+                });
+
+                // Обновляем маркеры на карте
+                addMarkers(filteredData);
+                
+                // Обновляем таблицу с данными
+                updateTable(filteredData);
+            }
+
+            function updateTable(data) {
+                var tbody = $('#dataTable tbody');
+                tbody.empty();
+                
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="5" class="text-center">Нет данных для отображения.</td></tr>');
+                    return;
+                }
+                
+                data.forEach(function(item) {
+                    var row = '<tr>' +
+                        '<td>' + item.city + '</td>' +
+                        '<td>' + item.region + '</td>' +
+                        '<td>' + item.averageScore + '</td>' +
+                        '<td>' + item.totalAccepted + '</td>' +
+                        '<td>' + item.totalApplicants + '</td>' +
+                        '</tr>';
+                    tbody.append(row);
+                });
+            }
+
+            // Функция для обновления списка городов в зависимости от выбранного региона
+            function updateCityFilter() {
+                var selectedRegion = $('#regionFilter').val();
+                var cityFilter = $('#cityFilter');
+                var currentCityValue = cityFilter.val();
+                
+                // Получаем уникальные города для выбранного региона
+                var cities = new Set();
+                applicantData.forEach(function(data) {
+                    if (selectedRegion.length === 0 || data.region === selectedRegion) {
+                        cities.add(data.city);
+                    }
+                });
+                
+                // Обновляем выпадающий список городов
+                cityFilter.empty();
+                cityFilter.append('<option value="">Все города</option>');
+                var sortedCities = Array.from(cities).sort();
+                sortedCities.forEach(function(city) {
+                    cityFilter.append('<option value="' + city + '">' + city + '</option>');
+                });
+                
+                // Если ранее выбранный город есть в новом списке, восстанавливаем выбор
+                if (currentCityValue && sortedCities.includes(currentCityValue)) {
+                    cityFilter.val(currentCityValue);
+                } else {
+                    cityFilter.val('');
+                }
+            }
+
+            // При изменении региона обновляем список городов и применяем фильтр
+            $('#regionFilter').on('change', function() {
+                updateCityFilter();
+                filterData();
+            });
+            
+            // При изменении города применяем фильтр
+            $('#cityFilter').on('change', filterData);
+        </script>
+    {% endif %}
+
+{% endblock %}

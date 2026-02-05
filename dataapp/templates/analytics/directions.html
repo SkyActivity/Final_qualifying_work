@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Заголовок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>
+                        Аналитика по направлениям и специальностям
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">Популярность специальностей и распределение по формам обучения</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Топ специальностей -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Топ-20 специальностей</h5>
+                    <div class="chart-container">
+                        {{ graph_bar|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Распределение по формам обучения и уровням -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Распределение по формам обучения</h5>
+                    <div class="chart-container">
+                        {{ graph_pie|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Распределение по уровням образования</h5>
+                    <div class="chart-container">
+                        {{ graph_levels|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица топ-10 специальностей -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h5 class="card-title mb-0">Детальная статистика (Топ-10)</h5>
+                        <span class="text-muted small">
+                            <i class="bi bi-info-circle me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Бюджетные места — финансирование РФ, платные места — контрактная основа."></i>
+                            Бюджетные и платные места
+                        </span>
+                    </div>
+                    {% if specialties_data %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Специальность</th>
+                                        <th>Всего студентов</th>
+                                        <th>Бюджетные места</th>
+                                        <th>Платные места</th>
+                                        <th>Средний балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in specialties_data %}
+                                    <tr>
+                                        <td><strong>{{ forloop.counter }}</strong></td>
+                                        <td>{{ item.specialty }}</td>
+                                        <td><span class="badge bg-primary">{{ item.total_students|default:0 }}</span></td>
+                                        <td>{{ item.budget_rf|default:"-" }}</td>
+                                        <td>{{ item.paid_students|default:"-" }}</td>
+                                        <td><span class="badge bg-success">{{ item.avg_score|floatformat:1|default:"-" }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Нет данных для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chart-container {
+    min-height: 400px;
+}
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.75em;
+}
+</style>
+{% endblock %}
+

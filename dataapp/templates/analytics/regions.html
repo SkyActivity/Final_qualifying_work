@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Заголовок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        Аналитика по регионам и городам
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">Сравнительный анализ данных по регионам России</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- График сравнения регионов -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Сравнение регионов</h5>
+                    <div class="chart-container">
+                        {{ graph_regions|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Средние баллы и количество городов -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Средние баллы по регионам</h5>
+                    <div class="chart-container">
+                        {{ graph_scores|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Количество городов по регионам</h5>
+                    <div class="chart-container">
+                        {{ graph_cities|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детальная таблица -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Детальная статистика по регионам</h5>
+                    {% if regions_stats %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Регион</th>
+                                        <th>Городов</th>
+                                        <th>Всего абитуриентов</th>
+                                        <th>Поступило по баллам</th>
+                                        <th>Средний балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in regions_stats %}
+                                    <tr>
+                                        <td><strong>{{ item.region }}</strong></td>
+                                        <td><span class="badge bg-info">{{ item.total_cities }}</span></td>
+                                        <td><span class="badge bg-primary">{{ item.total_applicants }}</span></td>
+                                        <td><span class="badge bg-success">{{ item.total_students }}</span></td>
+                                        <td><span class="badge bg-warning text-dark">{{ item.avg_score }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Нет данных для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chart-container {
+    min-height: 400px;
+}
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.75em;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.075);
+}
+</style>
+{% endblock %}
+

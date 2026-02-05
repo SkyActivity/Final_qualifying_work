@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Загрузка -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-upload me-2"></i>
+                        Загрузка
+                    </h5>
+                    <div class="border rounded-3 p-3">
+                        <h6 class="fw-bold mb-3">Форма загрузки данных</h6>
+                        {% include 'upload.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.form-select, .form-control {
+    border-radius: 8px;
+}
+.btn {
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

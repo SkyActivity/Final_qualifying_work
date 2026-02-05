@@ -1,0 +1,51 @@
+ER (Entity-Relationship) Diagram Summary
+======================================
+
+Entities (tables)
+-----------------
+1) ApplicantRecord
+   - code (Text)
+   - specialty (Char)
+   - education_level (Char)
+   - learning_form (Char)
+   - total_students (Integer)
+   - budget_rf (Integer)
+   - paid_students (Integer)
+   - average_score (Integer)
+   - year (Integer)
+
+2) ApplicantMapRecord
+   - region (Char)
+   - city (Char)
+   - count (Integer)
+   - lat (Float)
+   - lon (Float)
+   - code (Char)
+
+3) StudentRecord
+   - fio (Char)
+   - gender (Char)
+   - age (Integer)
+   - birth_date (Date)
+   - city (Char)
+   - region (Char)
+   - math_score (Float)
+   - russian_score (Float)
+   - profile_subject (Char)
+   - profile_score (Float)
+   - avg_score (Float)
+   - specialty_code (Char)
+   - specialty (Char)
+   - learning_form (Char)
+   - education_level (Char)
+   - passing_score (Float)
+
+Relationships
+-------------
+There are no explicit foreign keys in the current schema.
+Logical links used by the app:
+- ApplicantMapRecord <-> StudentRecord
+  Matching by (city, region) to show map statistics.
+- ApplicantRecord <-> StudentRecord
+  Matching by specialty metadata (code, specialty, learning_form, education_level, year)
+  for aggregated charts.

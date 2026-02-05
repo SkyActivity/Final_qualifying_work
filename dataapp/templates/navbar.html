@@ -1,0 +1,21 @@
+<ul class="sidebar-nav" id="sidebar-nav">
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'dashboard' %}"><i class="bi bi-grid"></i><span>Главная</span></a></li>
+    {% if user.is_authenticated %}
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'chart' %}"><i class="bi bi-upload"></i><span>Загрузка</span></a></li>
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'map' %}"><i class="bi bi-map"></i><span>Карта</span></a></li>
+    <li class="nav-heading">Аналитика</li>
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'analytics_years' %}"><i class="bi bi-graph-up-arrow"></i><span>По годам</span></a></li>
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'analytics_directions' %}"><i class="bi bi-pie-chart"></i><span>По направлениям</span></a></li>
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'analytics_regions' %}"><i class="bi bi-geo-alt"></i><span>По регионам</span></a></li>
+    <li class="nav-item"><a class="nav-link collapsed" href="{% url 'analytics_students' %}"><i class="bi bi-people"></i><span>По студентам</span></a></li>
+    <li class="nav-item">
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="nav-link collapsed"><i class="bi bi-box-arrow-right"></i><span>Выйти</span></button>
+        </form>
+    </li>
+    {% else %}
+    <li class="nav-item"><a  class="nav-link collapsed" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right"></i><span>Авторизация</span></a></li>
+    <li class="nav-item"><a  class="nav-link collapsed" href="{% url 'register' %}"><i class="bi bi-card-list"></i><span>Регистрация</span></a></li>
+    {% endif %}
+</ul>

@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Приветственный блок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg welcome-banner">
+                <div class="card-body py-5 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="welcome-icon me-4">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div class="flex-grow-1" style="position: relative; z-index: 1;">
+                            <h1 class="display-5 fw-bold mb-3 welcome-title">
+                                Добро пожаловать в VisualData
+                            </h1>
+                            <p class="lead mb-0 welcome-subtitle">
+                                Система визуализации и анализа данных о поступлении абитуриентов в российские вузы
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Быстрая статистика -->
+    {% if user.is_authenticated %}
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3" style="color: #667eea;">
+                        <i class="bi bi-people fs-1"></i>
+                    </div>
+                    <h3 class="mb-1">{{ total_students|default:"-" }}</h3>
+                    <p class="text-muted mb-0">Всего студентов</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3" style="color: #f093fb;">
+                        <i class="bi bi-book fs-1"></i>
+                    </div>
+                    <h3 class="mb-1">{{ total_specialties|default:"-" }}</h3>
+                    <p class="text-muted mb-0">Специальностей</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3" style="color: #4facfe;">
+                        <i class="bi bi-geo-alt fs-1"></i>
+                    </div>
+                    <h3 class="mb-1">{{ total_regions|default:"-" }}</h3>
+                    <p class="text-muted mb-0">Регионов</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3" style="color: #43e97b;">
+                        <i class="bi bi-star fs-1"></i>
+                    </div>
+                    <h3 class="mb-1">{{ avg_score|default:"-" }}</h3>
+                    <p class="text-muted mb-0">Средний балл</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Быстрые ссылки -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4">Быстрый доступ</h3>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'chart' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 quick-link-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="quick-link-icon me-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="bi bi-upload text-white fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Загрузка данных</h5>
+                                <p class="text-muted mb-0 small">Импорт Data.xlsx для аналитики</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'map' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 quick-link-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="quick-link-icon me-3" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <i class="bi bi-map text-white fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Карта</h5>
+                                <p class="text-muted mb-0 small">Географическое распределение</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'analytics_years' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 quick-link-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="quick-link-icon me-3" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <i class="bi bi-graph-up-arrow text-white fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Аналитика</h5>
+                                <p class="text-muted mb-0 small">Глубокий анализ данных</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Разделы аналитики -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Разделы аналитики</h3>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'analytics_years' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 analytics-card">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up-arrow fs-2 mb-3 d-block" style="color: #667eea;"></i>
+                        <h5 class="card-title">По годам</h5>
+                        <p class="text-muted small">Динамика поступлений и тренды изменений</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'analytics_directions' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 analytics-card">
+                    <div class="card-body">
+                        <i class="bi bi-pie-chart fs-2 mb-3 d-block" style="color: #f093fb;"></i>
+                        <h5 class="card-title">По направлениям</h5>
+                        <p class="text-muted small">Популярность специальностей и распределение</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'analytics_regions' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 analytics-card">
+                    <div class="card-body">
+                        <i class="bi bi-geo-alt fs-2 mb-3 d-block" style="color: #4facfe;"></i>
+                        <h5 class="card-title">По регионам</h5>
+                        <p class="text-muted small">Сравнительный анализ по регионам</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-lock fs-1 text-muted mb-3 d-block"></i>
+                    <h4 class="mb-3">Для доступа к функциям необходимо авторизоваться</h4>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'login' %}" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus me-2"></i>Регистрация
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* Приветственный баннер */
+.welcome-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-banner .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.welcome-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.welcome-icon i {
+    font-size: 3rem;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-title {
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.welcome-subtitle {
+    text-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.5),
+        0 2px 6px rgba(0, 0, 0, 0.3);
+    color: #ffffff !important;
+    font-weight: 400;
+    line-height: 1.6;
+    opacity: 1;
+}
+
+.stats-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.quick-link-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.quick-link-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.quick-link-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.analytics-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.analytics-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .welcome-icon {
+        width: 60px;
+        height: 60px;
+    }
+    .welcome-icon i {
+        font-size: 2rem;
+    }
+    .welcome-title {
+        font-size: 2rem !important;
+    }
+    .welcome-subtitle {
+        font-size: 1rem !important;
+    }
+}
+</style>
+{% endblock %}

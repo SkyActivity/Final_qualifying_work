@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Заголовок -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">
+                        <i class="bi bi-graph-up-arrow me-2"></i>
+                        Динамика поступлений по годам
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">Анализ тенденций и изменений в количестве поступивших студентов</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной график динамики -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Тренды поступлений</h5>
+                    <div class="chart-container">
+                        {{ graph_trends|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- График средних баллов и статистика -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Динамика средних баллов</h5>
+                    <div class="chart-container">
+                        {{ graph_scores|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Сводная статистика</h5>
+                    {% if years_data %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Год</th>
+                                        <th>Студентов</th>
+                                        <th>Балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in years_data %}
+                                        {% if item.year %}
+                                        <tr>
+                                            <td><strong>{{ item.year }}</strong></td>
+                                            <td>{{ item.total_students|default:0 }}</td>
+                                            <td>{{ item.avg_score|floatformat:1|default:"-" }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Нет данных для отображения</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chart-container {
+    min-height: 400px;
+}
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+
