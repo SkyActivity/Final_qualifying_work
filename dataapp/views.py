@@ -1070,6 +1070,25 @@ def export_map_data_csv(request):
 
     return response
 
+
+def clear_database(request):
+    """Очистка базы: удаление направлений и студентов, данные карты не трогаем."""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Метод не разрешён.'}, status=405)
+    n_app = ApplicantRecord.objects.count()
+    n_stud = StudentRecord.objects.count()
+    n_map = ApplicantMapRecord.objects.count()
+    ApplicantRecord.objects.all().delete()
+    StudentRecord.objects.all().delete()
+    return JsonResponse({
+        'status': 'success',
+        'message': f'База очищена. Удалено: {n_app} направлений, {n_stud} студентов. Данные карты сохранены ({n_map} записей).',
+        'deleted_applicants': n_app,
+        'deleted_students': n_stud,
+        'map_preserved': n_map,
+    })
+
+
 # Новые представления для аналитики
 
 def analytics_years(request):

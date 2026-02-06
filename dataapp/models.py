@@ -1,5 +1,5 @@
 from django.db import models
-
+# Определяют структуру базы данных
 class ApplicantRecord(models.Model):
     code = models.TextField()
     specialty = models.CharField(max_length=255)

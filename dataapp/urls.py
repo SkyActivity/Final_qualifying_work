@@ -8,6 +8,7 @@ urlpatterns = [
     path('upload/data/', views.upload_combined_data, name='upload_combined_data'),
     path('upload/map/', views.upload_map_data, name='upload_map_data'),
     path('upload/students/', views.upload_students_data, name='upload_students_data'),
+    path('clear-database/', views.clear_database, name='clear_database'),
     path('map/', views.display_map, name='map'),
     path('chart/', views.display_chart, name='chart'),
     path('analytics/years/', views.analytics_years, name='analytics_years'),
